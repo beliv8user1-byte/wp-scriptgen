@@ -1,19 +1,51 @@
 // netlify/functions/generate-script.mjs
+import fetch from "node-fetch";
+import * as cheerio from "cheerio";
 
 const SCRIPT_INSTRUCTIONS = (process.env.SCRIPT_INSTRUCTIONS || `
-You are an Explainer Video Script Generator Expert. 
-Follow these rules carefully: 
-1. Structure (Max 60 Seconds) HOOK (0–8s) Grab attention fast with pain point or striking statement. 
-PROBLEM (8–18s) State the challenge in 1–2 simple sentences. SOLUTION (18–36s) Introduce the brand/product as the answer. Clear + impactful. TRUST (36–48s) Show credibility: industries served, results, or use-cases. CLOSE (48–60s) Strong vision + CTA. 
-2. Tone & Style Concise, clear, problem-oriented. Conversational but authoritative. Impactful short sentences. Solution-focused. Avoid jargon. End with CTA. 
-3. Key Rules ✔ Never exceed 60 seconds ✔ Always include timestamps ✔ Always start with problem → solution ✔ Write like explaining to a smart 12-year-old ✔ End with clear CTA. Overall word limit is 120-150 words
+You are an Explainer Video Script Generator Expert. Follow these instructions carefully:
+
+1. Structure (Max 60 Seconds)
+HOOK (0–8s) → grab attention fast.
+PROBLEM (8–18s) → describe the challenge clearly.
+SOLUTION (18–36s) → introduce the product/brand.
+TRUST (36–48s) → build credibility with proof or results.
+CLOSE (48–60s) → strong ending with vision + CTA.
+
+2. Tone & Style
+- Concise, clear, conversational
+- Short impactful sentences
+- Avoid jargon, aim for clarity
+- Always include timestamps
+- End with a clear CTA
 `).trim();
 
 /**
- * Netlify Function Entry
+ * Scrape text from a website
  */
+async function scrapeWebsite(url) {
+  try {
+    const res = await fetch(url);
+    const html = await res.text();
+    const $ = cheerio.load(html);
+
+    // Grab text from headings, paragraphs, and meta descriptions
+    const textParts = [];
+    $("h1, h2, h3, p, meta[name='description']").each((_, el) => {
+      const content = $(el).text() || $(el).attr("content");
+      if (content && content.trim().length > 30) {
+        textParts.push(content.trim());
+      }
+    });
+
+    // Limit so we don’t overload the model
+    return textParts.slice(0, 30).join("\n\n");
+  } catch (err) {
+    return `Error scraping site: ${err.message}`;
+  }
+}
+
 export async function handler(event, context) {
-  // Handle preflight (CORS)
   if (event.httpMethod === "OPTIONS") {
     return {
       statusCode: 200,
@@ -25,14 +57,19 @@ export async function handler(event, context) {
     };
   }
 
-  // Only allow POST
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
   try {
     const body = JSON.parse(event.body || "{}");
-    const { business_name, website, about } = body;
+    const { business_name, website } = body;
+
+    // Scrape website
+    let scrapedContent = "";
+    if (website) {
+      scrapedContent = await scrapeWebsite(website);
+    }
 
     const prompt = `
 ${SCRIPT_INSTRUCTIONS}
@@ -40,9 +77,11 @@ ${SCRIPT_INSTRUCTIONS}
 Company Details:
 - Business Name: ${business_name || "N/A"}
 - Website: ${website || "N/A"}
-- About: ${about || "N/A"}
 
-Generate a 60-second explainer video script.
+Extracted Website Content:
+${scrapedContent}
+
+Now, generate a 60-second explainer video script that reflects the brand and offerings.
 `;
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -59,20 +98,16 @@ Generate a 60-second explainer video script.
 
     const data = await response.json();
 
-    if (!data || !data.choices || data.choices.length === 0) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: "Empty response from OpenRouter" }),
-      };
-    }
-
     return {
       statusCode: 200,
       headers: {
         "Access-Control-Allow-Origin": process.env.ALLOWED_ORIGINS || "*",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ script: data.choices[0].message.content }),
+      body: JSON.stringify({
+        script: data.choices?.[0]?.message?.content || "No script generated",
+        scraped_data: scrapedContent,
+      }),
     };
 
   } catch (err) {
