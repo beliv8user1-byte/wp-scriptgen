@@ -5,6 +5,6 @@
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
     "nodemailer": "^6.9.14",
-    "node-fetch": "^3.3.2",
+    "node-fetch": "^3.3.2"
   }
 }
