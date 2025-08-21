@@ -1,6 +1,6 @@
 // netlify/functions/generate-script.js
-import fetch from "node-fetch";
-import * as cheerio from "cheerio";
+const fetch = require("node-fetch");
+const cheerio = require("cheerio");
 
 // Safe text truncation
 function safe(text, max = 1000) {
@@ -36,11 +36,12 @@ async function scrapeSite(url) {
       points: [title, desc, h1],
     };
   } catch (err) {
+    console.error("scrapeSite failed:", err.message);
     return { summary: "", points: [] };
   }
 }
 
-// Scrape a LinkedIn page (basic — LinkedIn often blocks bots)
+// Scrape LinkedIn (basic — LinkedIn often blocks bots)
 async function scrapeLinkedIn(url) {
   if (!url) return { summary: "", points: [] };
   try {
@@ -60,57 +61,50 @@ async function scrapeLinkedIn(url) {
 
     return { summary: text, points: [title, desc] };
   } catch (e) {
+    console.error("scrapeLinkedIn failed:", e.message);
     return { summary: "", points: [] };
   }
 }
 
-// Script Instructions
+// Instructions
 const SCRIPT_INSTRUCTIONS = (process.env.SCRIPT_INSTRUCTIONS || `
 You are an Explainer Video Script Generator Expert. Follow these rules carefully:
 
-1. Structure (Max 60 Seconds)
 HOOK (0–8s)
-Grab attention fast with pain point or striking statement.
+Grab attention fast.
 PROBLEM (8–18s)
-State the challenge in 1–2 simple sentences.
+State the challenge simply.
 SOLUTION (18–36s)
-Introduce the brand/product as the answer. Clear + impactful.
+Introduce the brand/product as the answer.
 TRUST (36–48s)
-Show credibility: industries served, results, or use-cases.
+Show credibility.
 CLOSE (48–60s)
-Strong vision + CTA.
+Vision + CTA.
 
-2. Tone & Style
-Concise, clear, problem-oriented. Conversational but authoritative.
-Impactful short sentences. Solution-focused. Avoid jargon.
-End with CTA.
-
-3. Key Rules
-✔ Never exceed 60 seconds
-✔ Always include timestamps
-✔ Always start with problem → solution
-✔ Keep sentences short (8–12 words)
-✔ Write like explaining to a smart 12-year-old
-✔ End with clear CTA
+Rules:
+- Max 60 seconds
+- Always include timestamps
+- Short sentences
+- Conversational but authoritative
+- End with CTA
 `).trim();
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+exports.handler = async (event, context) => {
+  if (event.httpMethod !== "POST") {
+    return { statusCode: 405, body: JSON.stringify({ error: "Method not allowed" }) };
   }
 
   try {
-    const { business_name, email, website, linkedin, notes } = req.body || {};
+    const body = JSON.parse(event.body || "{}");
+    const { business_name, email, website, linkedin, notes } = body;
 
     if (!business_name) {
-      return res.status(400).json({ error: "Missing business_name" });
+      return { statusCode: 400, body: JSON.stringify({ error: "Missing business_name" }) };
     }
 
-    // Scrape website + LinkedIn
     const scrapedWebsite = await scrapeSite(website);
     const scrapedLinkedIn = await scrapeLinkedIn(linkedin);
 
-    // Build profile block
     const profileBlock = `
 Company Name: ${safe(business_name)}
 Business Email: ${safe(email)}
@@ -133,10 +127,8 @@ ${safe(
 )}
 `;
 
-    // Final prompt
     const userPrompt = `${SCRIPT_INSTRUCTIONS}\n\nPROFILE DATA:\n${profileBlock}`;
 
-    // Call OpenRouter
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -156,13 +148,16 @@ ${safe(
     const script = data?.choices?.[0]?.message?.content || "";
 
     if (!script.trim()) {
-      return res.status(500).json({ error: "Empty response from model", raw: data });
+      console.error("OpenRouter empty response:", data);
+      return { statusCode: 500, body: JSON.stringify({ error: "Empty response from model", raw: data }) };
     }
 
-    // Respond with JSON
-    return res.status(200).json({ script });
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ script }),
+    };
   } catch (error) {
-    console.error("Script generation failed:", error);
-    return res.status(500).json({ error: error.message });
+    console.error("Handler failed:", error);
+    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
   }
-}
+};
