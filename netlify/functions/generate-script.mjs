@@ -1,163 +1,93 @@
-// netlify/functions/generate-script.js
-const fetch = require("node-fetch");
-const cheerio = require("cheerio");
+// netlify/functions/generate-script.mjs
 
-// Safe text truncation
-function safe(text, max = 1000) {
-  if (!text) return "";
-  return String(text).replace(/\s+/g, " ").slice(0, max);
-}
-
-// Scrape a company website
-async function scrapeSite(url) {
-  if (!url) return { summary: "", points: [] };
-  try {
-    const res = await fetch(url, {
-      redirect: "follow",
-      headers: { "User-Agent": "ScriptGenBot/1.0 (+contact: web)" },
-    });
-    const html = await res.text();
-    const $ = cheerio.load(html);
-
-    const title = $("title").first().text();
-    const desc =
-      $('meta[name="description"]').attr("content") ||
-      $('meta[property="og:description"]').attr("content") ||
-      "";
-    const h1 = $("h1").first().text();
-    const paragraphs = $("p")
-      .slice(0, 3)
-      .map((i, el) => $(el).text())
-      .get()
-      .join(" ");
-
-    return {
-      summary: [title, desc, h1, paragraphs].join(" ").replace(/\s+/g, " "),
-      points: [title, desc, h1],
-    };
-  } catch (err) {
-    console.error("scrapeSite failed:", err.message);
-    return { summary: "", points: [] };
-  }
-}
-
-// Scrape LinkedIn (basic — LinkedIn often blocks bots)
-async function scrapeLinkedIn(url) {
-  if (!url) return { summary: "", points: [] };
-  try {
-    const res = await fetch(url, {
-      redirect: "follow",
-      headers: { "User-Agent": "ScriptGenBot/1.0 (+contact: web)" },
-    });
-    const html = await res.text();
-    const $ = cheerio.load(html);
-
-    const title = $("title").first().text();
-    const desc =
-      $('meta[name="description"]').attr("content") ||
-      $('meta[property="og:description"]').attr("content") ||
-      "";
-    const text = [title, desc].join(" ").replace(/\s+/g, " ").slice(0, 2000);
-
-    return { summary: text, points: [title, desc] };
-  } catch (e) {
-    console.error("scrapeLinkedIn failed:", e.message);
-    return { summary: "", points: [] };
-  }
-}
-
-// Instructions
 const SCRIPT_INSTRUCTIONS = (process.env.SCRIPT_INSTRUCTIONS || `
-You are an Explainer Video Script Generator Expert. Follow these rules carefully:
+You are an Explainer Video Script Generator Expert. Follow these instructions carefully:
 
-HOOK (0–8s)
-Grab attention fast.
-PROBLEM (8–18s)
-State the challenge simply.
-SOLUTION (18–36s)
-Introduce the brand/product as the answer.
-TRUST (36–48s)
-Show credibility.
-CLOSE (48–60s)
-Vision + CTA.
+1. Structure (Max 60 Seconds)
+HOOK (0–8s) → grab attention fast.
+PROBLEM (8–18s) → describe the challenge clearly.
+SOLUTION (18–36s) → introduce the product/brand.
+TRUST (36–48s) → build credibility with proof or results.
+CLOSE (48–60s) → strong ending with vision + CTA.
 
-Rules:
-- Max 60 seconds
+2. Tone & Style
+- Concise, clear, conversational
+- Short impactful sentences
+- Avoid jargon, aim for clarity
 - Always include timestamps
-- Short sentences
-- Conversational but authoritative
-- End with CTA
+- End with a clear CTA
 `).trim();
 
-exports.handler = async (event, context) => {
+/**
+ * Netlify Function Entry
+ */
+export async function handler(event, context) {
+  // Handle preflight (CORS)
+  if (event.httpMethod === "OPTIONS") {
+    return {
+      statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": process.env.ALLOWED_ORIGINS || "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+      },
+    };
+  }
+
+  // Only allow POST
   if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: JSON.stringify({ error: "Method not allowed" }) };
+    return { statusCode: 405, body: "Method Not Allowed" };
   }
 
   try {
     const body = JSON.parse(event.body || "{}");
-    const { business_name, email, website, linkedin, notes } = body;
+    const { business_name, website, about } = body;
 
-    if (!business_name) {
-      return { statusCode: 400, body: JSON.stringify({ error: "Missing business_name" }) };
-    }
+    const prompt = `
+${SCRIPT_INSTRUCTIONS}
 
-    const scrapedWebsite = await scrapeSite(website);
-    const scrapedLinkedIn = await scrapeLinkedIn(linkedin);
+Company Details:
+- Business Name: ${business_name || "N/A"}
+- Website: ${website || "N/A"}
+- About: ${about || "N/A"}
 
-    const profileBlock = `
-Company Name: ${safe(business_name)}
-Business Email: ${safe(email)}
-Website: ${safe(website)}
-LinkedIn: ${safe(linkedin)}
-
---- User Notes ---
-${safe(notes, 2000)}
-
---- Website Extract ---
-${safe(scrapedWebsite.summary, 2000)}
-
---- LinkedIn Extract ---
-${safe(scrapedLinkedIn.summary, 2000)}
-
---- Keywords ---
-${safe(
-  [...scrapedWebsite.points, ...scrapedLinkedIn.points].join("; "),
-  500
-)}
+Generate a 60-second explainer video script.
 `;
-
-    const userPrompt = `${SCRIPT_INSTRUCTIONS}\n\nPROFILE DATA:\n${profileBlock}`;
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini",
-        messages: [
-          { role: "system", content: "You are an expert video scriptwriter." },
-          { role: "user", content: userPrompt },
-        ],
+        model: process.env.OPENROUTER_MODEL || "gpt-4o-mini",
+        messages: [{ role: "user", content: prompt }],
       }),
     });
 
     const data = await response.json();
-    const script = data?.choices?.[0]?.message?.content || "";
 
-    if (!script.trim()) {
-      console.error("OpenRouter empty response:", data);
-      return { statusCode: 500, body: JSON.stringify({ error: "Empty response from model", raw: data }) };
+    if (!data || !data.choices || data.choices.length === 0) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "Empty response from OpenRouter" }),
+      };
     }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ script }),
+      headers: {
+        "Access-Control-Allow-Origin": process.env.ALLOWED_ORIGINS || "*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ script: data.choices[0].message.content }),
     };
-  } catch (error) {
-    console.error("Handler failed:", error);
-    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+
+  } catch (err) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message }),
+    };
   }
-};
+}
