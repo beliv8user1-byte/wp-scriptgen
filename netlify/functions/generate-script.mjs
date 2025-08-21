@@ -1,196 +1,168 @@
-// netlify/functions/generate-script.mjs
-// Minimal, production-ready function: CORS, scraping, LLM call, optional email.
-
+// netlify/functions/generate-script.js
+import fetch from "node-fetch";
 import * as cheerio from "cheerio";
-import nodemailer from "nodemailer";
 
-// ===== Env =====
-const OPENROUTER_API_KEY = Netlify.env.get("OPENROUTER_API_KEY");
-const OPENROUTER_MODEL = Netlify.env.get("OPENROUTER_MODEL") || "qwen/qwen-2.5-7b-instruct"; // change in Netlify if you like
-const ALLOWED_ORIGINS = (Netlify.env.get("ALLOWED_ORIGINS") || "*")
-  .split(",")
-  .map(s => s.trim())
-  .filter(Boolean);
+// Safe text truncation
+function safe(text, max = 1000) {
+  if (!text) return "";
+  return String(text).replace(/\s+/g, " ").slice(0, max);
+}
 
-// Optional SMTP for emailing output
-const SMTP_HOST = Netlify.env.get("SMTP_HOST");
-const SMTP_PORT = Number(Netlify.env.get("SMTP_PORT") || 587);
-const SMTP_SECURE = Netlify.env.get("SMTP_SECURE") === "true"; // true for 465, false for 587
-const SMTP_USER = Netlify.env.get("SMTP_USER");
-const SMTP_PASS = Netlify.env.get("SMTP_PASS");
-const SMTP_FROM = Netlify.env.get("SMTP_FROM") || SMTP_USER;
-
-// Your script rules. Update this to fit your brand.
-const SCRIPT_INSTRUCTIONS = (Netlify.env.get("SCRIPT_INSTRUCTIONS") || `
-You are a Explainor Video Script Generator Expert. You need to follow this instructions carefully
-
-1. Structure (Max 60 Seconds)
-We always follow this 5-part structure with timestamps to keep scripts concise and powerful:
-HOOK (0–8s)
-Grab attention fast. Start with the biggest pain point or a striking statement.
-Example: “Creating videos is easy. Growing them worldwide? That’s where creators hit the wall.”
-PROBLEM (8–18s)
-Describe the challenge clearly and simply. One or two sentences.
-Example: “Languages, captions, dubbing, multiple channels… it’s messy, expensive, and eats up your time.”
-SOLUTION (18–36s)
-Introduce the brand/product as the answer. Focus on clarity + impact.
-Example: “That’s why we built Braiv — the all-in-one platform to translate, manage, and publish your content worldwide.”
-TRUST (36–48s)
-Build credibility. Use proof like results, use-cases, industries served, or notable clients (without naming if not needed).
-Example: “Already trusted by creators, educators, and marketers to scale content across 29+ languages.”
-CLOSE (48–60s)
-End strong with vision + CTA.
-Example: “Break barriers. Captivate audiences. Grow without limits. Braiv — from local to global, made simple.”
-
-2. Tone & Style
-
-Concise, clear, and problem-oriented (no fluff).
-Conversational but authoritative (sounds like you’re guiding, not selling).
-Impactful short sentences → avoids long, complex lines.
-Solution-focused → not just features, but how it changes outcomes.
-Subtle trust-building → never overhype, just confident.
-
-3. Key Rules
-
-✔ Never exceed 60 seconds
-✔ Always include timestamps
-✔ Always start with problem → solution
-✔ Keep sentences short (ideal: 8–12 words)
-✔ Avoid jargon — write like explaining to a smart 12-year-old
-✔ End with a clear CTA (vision + action)
-`).trim();
-
-// ===== Helpers =====
-const corsHeaders = (origin) => {
-  const allowed = ALLOWED_ORIGINS.includes("*")
-    ? "*"
-    : (ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0] || "");
-  return {
-    "Access-Control-Allow-Origin": allowed || "*",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS"
-  };
-};
-
-const safe = (v, n = 1200) => (v || "").toString().replace(/\s+/g, " ").slice(0, n);
-
+// Scrape a company website
 async function scrapeSite(url) {
   if (!url) return { summary: "", points: [] };
   try {
     const res = await fetch(url, {
       redirect: "follow",
-      headers: { "User-Agent": "ScriptGenBot/1.0 (+contact: web)" }
+      headers: { "User-Agent": "ScriptGenBot/1.0 (+contact: web)" },
     });
     const html = await res.text();
     const $ = cheerio.load(html);
-    const title = $('meta[property="og:title"]').attr('content') || $('title').first().text();
-    const desc = $('meta[name="description"]').attr('content') || $('meta[property="og:description"]').attr('content') || "";
-    const h1 = $('h1').first().text();
-    const paragraphs = $('p').map((i, el) => $(el).text()).get().filter(Boolean).slice(0, 6).join(' ');
-    const text = [title, desc, h1, paragraphs].join(' ').replace(/\s+/g, ' ').slice(0, 2000);
-    const points = [];
-    const kw = $('meta[name="keywords"]').attr('content');
-    if (kw) kw.split(',').slice(0,5).forEach(k => points.push(k.trim()));
-    return { summary: text, points };
+
+    const title = $("title").first().text();
+    const desc =
+      $('meta[name="description"]').attr("content") ||
+      $('meta[property="og:description"]').attr("content") ||
+      "";
+    const h1 = $("h1").first().text();
+    const paragraphs = $("p")
+      .slice(0, 3)
+      .map((i, el) => $(el).text())
+      .get()
+      .join(" ");
+
+    return {
+      summary: [title, desc, h1, paragraphs].join(" ").replace(/\s+/g, " "),
+      points: [title, desc, h1],
+    };
+  } catch (err) {
+    return { summary: "", points: [] };
+  }
+}
+
+// Scrape a LinkedIn page (basic — LinkedIn often blocks bots)
+async function scrapeLinkedIn(url) {
+  if (!url) return { summary: "", points: [] };
+  try {
+    const res = await fetch(url, {
+      redirect: "follow",
+      headers: { "User-Agent": "ScriptGenBot/1.0 (+contact: web)" },
+    });
+    const html = await res.text();
+    const $ = cheerio.load(html);
+
+    const title = $("title").first().text();
+    const desc =
+      $('meta[name="description"]').attr("content") ||
+      $('meta[property="og:description"]').attr("content") ||
+      "";
+    const text = [title, desc].join(" ").replace(/\s+/g, " ").slice(0, 2000);
+
+    return { summary: text, points: [title, desc] };
   } catch (e) {
     return { summary: "", points: [] };
   }
 }
 
-async function emailScript(to, script, subjectBits = {}) {
-  try {
-    if (!SMTP_HOST || !to) return;
-    const transporter = nodemailer.createTransport({
-      host: SMTP_HOST,
-      port: SMTP_PORT,
-      secure: SMTP_SECURE,
-      auth: SMTP_USER ? { user: SMTP_USER, pass: SMTP_PASS } : undefined
-    });
-    const subject = `Your video script for ${subjectBits.business_name || subjectBits.website || 'your business'}`;
-    await transporter.sendMail({ from: SMTP_FROM, to, subject, text: script });
-  } catch (_) { /* non-blocking */ }
-}
+// Script Instructions
+const SCRIPT_INSTRUCTIONS = (process.env.SCRIPT_INSTRUCTIONS || `
+You are an Explainer Video Script Generator Expert. Follow these rules carefully:
 
-// ===== Function handler =====
-export default async (req, context) => {
-  const origin = req.headers.get('origin') || '';
+1. Structure (Max 60 Seconds)
+HOOK (0–8s)
+Grab attention fast with pain point or striking statement.
+PROBLEM (8–18s)
+State the challenge in 1–2 simple sentences.
+SOLUTION (18–36s)
+Introduce the brand/product as the answer. Clear + impactful.
+TRUST (36–48s)
+Show credibility: industries served, results, or use-cases.
+CLOSE (48–60s)
+Strong vision + CTA.
 
-  // CORS preflight
-  if (req.method === 'OPTIONS') {
-    return new Response('', { status: 204, headers: corsHeaders(origin) });
+2. Tone & Style
+Concise, clear, problem-oriented. Conversational but authoritative.
+Impactful short sentences. Solution-focused. Avoid jargon.
+End with CTA.
+
+3. Key Rules
+✔ Never exceed 60 seconds
+✔ Always include timestamps
+✔ Always start with problem → solution
+✔ Keep sentences short (8–12 words)
+✔ Write like explaining to a smart 12-year-old
+✔ End with clear CTA
+`).trim();
+
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
-  if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Use POST' }), {
-      status: 405,
-      headers: { ...corsHeaders(origin), 'Content-Type': 'application/json' }
-    });
-  }
-
   try {
-    const { website, linkedin, about, business_name, email } = await req.json();
-    if (!OPENROUTER_API_KEY) throw new Error('Missing OPENROUTER_API_KEY');
-    if (!website && !about && !linkedin) {
-      return new Response(JSON.stringify({ error: 'Provide at least one of: website, linkedin, about.' }), {
-        status: 400,
-        headers: { ...corsHeaders(origin), 'Content-Type': 'application/json' }
-      });
+    const { business_name, email, website, linkedin, notes } = req.body || {};
+
+    if (!business_name) {
+      return res.status(400).json({ error: "Missing business_name" });
     }
 
-    // Scrape website (LinkedIn is usually blocked, so we don’t scrape it)
-    const scraped = await scrapeSite(website);
+    // Scrape website + LinkedIn
+    const scrapedWebsite = await scrapeSite(website);
+    const scrapedLinkedIn = await scrapeLinkedIn(linkedin);
 
-    const dataBlock = `Business Name: ${safe(business_name)}\n`+
-      `Website: ${safe(website)}\n`+
-      `LinkedIn URL: ${safe(linkedin)}\n`+
-      `About (user-provided): ${safe(about, 2000)}\n`+
-      `Website summary: ${safe(scraped.summary, 2000)}\n`+
-      `Keywords: ${safe((scraped.points || []).join('; '), 500)}`;
+    // Build profile block
+    const profileBlock = `
+Company Name: ${safe(business_name)}
+Business Email: ${safe(email)}
+Website: ${safe(website)}
+LinkedIn: ${safe(linkedin)}
 
-    const userPrompt = `${SCRIPT_INSTRUCTIONS}\n\nDATA:\n${dataBlock}`;
+--- User Notes ---
+${safe(notes, 2000)}
 
-    const llmRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
+--- Website Extract ---
+${safe(scrapedWebsite.summary, 2000)}
+
+--- LinkedIn Extract ---
+${safe(scrapedLinkedIn.summary, 2000)}
+
+--- Keywords ---
+${safe(
+  [...scrapedWebsite.points, ...scrapedLinkedIn.points].join("; "),
+  500
+)}
+`;
+
+    // Final prompt
+    const userPrompt = `${SCRIPT_INSTRUCTIONS}\n\nPROFILE DATA:\n${profileBlock}`;
+
+    // Call OpenRouter
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-        // Optional attribution headers per OpenRouter guidelines
-        'HTTP-Referer': 'https://your-domain.example',
-        'X-Title': 'WP Script Generator'
+        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: OPENROUTER_MODEL,
+        model: process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini",
         messages: [
-          { role: 'system', content: 'You write concise, specific scripts for 60–90s explainer videos.' },
-          { role: 'user', content: userPrompt }
-        ]
-      })
+          { role: "system", content: "You are an expert video scriptwriter." },
+          { role: "user", content: userPrompt },
+        ],
+      }),
     });
 
-    const json = await llmRes.json();
-    if (!llmRes.ok) {
-      return new Response(JSON.stringify({ error: json?.error || 'LLM error', details: json }), {
-        status: 500,
-        headers: { ...corsHeaders(origin), 'Content-Type': 'application/json' }
-      });
+    const data = await response.json();
+    const script = data?.choices?.[0]?.message?.content || "";
+
+    if (!script.trim()) {
+      return res.status(500).json({ error: "Empty response from model", raw: data });
     }
 
-    const script = json?.choices?.[0]?.message?.content || '';
-
-    // Fire-and-forget email if user asked for it
-    if (email && script) {
-      context.waitUntil(emailScript(email, script, { business_name, website }));
-    }
-
-    return new Response(JSON.stringify({ script }), {
-      status: 200,
-      headers: { ...corsHeaders(origin), 'Content-Type': 'application/json' }
-    });
-  } catch (err) {
-    return new Response(JSON.stringify({ error: String(err?.message || err) }), {
-      status: 500,
-      headers: { ...corsHeaders(origin), 'Content-Type': 'application/json' }
-    });
+    // Respond with JSON
+    return res.status(200).json({ script });
+  } catch (error) {
+    console.error("Script generation failed:", error);
+    return res.status(500).json({ error: error.message });
   }
-};
-
+}
