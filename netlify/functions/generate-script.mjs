@@ -193,3 +193,27 @@ export default async (req, context) => {
     });
   }
 };
+
+
+console.log("Incoming payload:", payload);
+
+const aiResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+  method: "POST",
+  headers: {
+    "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    model: OPENROUTER_MODEL,
+    messages: [
+      { role: "system", content: SCRIPT_INSTRUCTIONS },
+      { role: "user", content: `Business: ${payload.business_name}\nWebsite: ${payload.website}\nAbout: ${payload.about}` }
+    ]
+  })
+});
+
+const result = await aiResponse.json();
+console.log("AI raw result:", result);
+
+const script = result?.choices?.[0]?.message?.content || "";
+
