@@ -140,9 +140,6 @@
 //       body: JSON.stringify({ error: err.message }),
 
 
-
-// netlify/functions/generate-script.mjs
-// ✅ No need for node-fetch if you're on Netlify Node 18+
 import * as cheerio from "cheerio";
 
 const SCRIPT_INSTRUCTIONS = (process.env.SCRIPT_INSTRUCTIONS || `
