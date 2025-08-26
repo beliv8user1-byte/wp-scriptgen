@@ -214,93 +214,104 @@ Now, generate a structured 60-second explainer video script using the required s
 
     /* --------------------------- EMAIL TEMPLATE --------------------------- */
     const emailHTML = `
-<div style="font-family: Arial, sans-serif; background: #ffffff; padding: 20px; max-width: 650px; margin: auto; border: 1px solid #e0e0e0; border-radius: 8px;">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Motion Hatch Email</title>
+  <style>
+    body {
+      font-family: Roboto, Arial, sans-serif;
+      font-size: 16px;
+      line-height: 28px;
+      color: #000;
+      margin: 0;
+      padding: 0;
+      background: #f8f8f8;
+    }
+    .container {
+      width: 100%;
+      max-width: 600px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    h1, h2, h3 {
+      margin: 16px 0 8px;
+    }
+    a {
+      color: #0B83FF;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .button {
+      display: inline-block;
+      background: #2BD5D4;
+      color: #fff !important;
+      padding: 12px 20px;
+      border-radius: 6px;
+      text-decoration: none;
+      margin: 12px 0;
+      font-weight: bold;
+    }
+    .footer {
+      font-size: 13px;
+      color: #666;
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Hey Ab!</h1>
+    <p>Over the next few days, I'm going to send you some of our best content and free resources. Enjoy!</p>
+    <p>Today, I want to share the most helpful YouTube videos I've created to help you attract more clients.</p>
+    <p><strong>Bookmark this email so you can come back to it!</strong></p>
 
-  <!-- Logo -->
-  <div style="text-align: center; margin-bottom: 20px;">
-    <img src="YOUR_LOGO_URL" alt="Logo" style="max-height: 40px;">
-    <hr style="border: none; border-top: 2px solid #00C2FF; margin-top: 15px;">
-  </div>
+    <h2>🎥 My Ultimate Guide to Getting Hired</h2>
+    <p><a href="https://youtu.be/Xebd2eBWCSU" class="button">Watch on YouTube</a></p>
 
-  <!-- Greeting -->
-  <p style="font-size: 16px; color: #333333; margin: 0 0 20px;">
-    Hey ${business_name || "there"}!
-  </p>
+    <h2>No Motion Design Clients? Here's How to Fix It!</h2>
+    <p><a href="https://youtu.be/Xebd2eBWCSU" class="button">Watch on YouTube</a></p>
 
-  <!-- Intro -->
-  <p style="font-size: 15px; color: #444444; line-height: 1.6; margin-bottom: 20px;">
-    Over the next few days, I'm going to send you some of our best content and free resources. Enjoy! <br><br>
-    Today, I want to share the most helpful YouTube videos I’ve created to help you attract more clients. <br><br>
-    Bookmark this email so you can come back to it!
-  </p>
+    <h2>How I'd Start My Freelance Business in 2024</h2>
+    <p><a href="https://youtu.be/M4UJw4V0iN8" class="button">Watch on YouTube</a></p>
 
-  <!-- Section Headline -->
-  <h2 style="font-size: 20px; color: #000000; margin-bottom: 20px;">
-    🎬 My Ultimate Guide to Getting Hired
-  </h2>
+    <h2>How I'd Get Direct Clients Starting From 0</h2>
+    <p><a href="https://youtu.be/iXUVuzDDE7g" class="button">Watch on YouTube</a></p>
 
-  <!-- Video Block 1 -->
-  <div style="display: flex; align-items: center; margin-bottom: 30px;">
-    <img src="THUMBNAIL_URL_1" alt="Video Thumbnail" style="width: 200px; border-radius: 6px; margin-right: 15px;">
-    <div>
-      <p style="font-size: 16px; font-weight: bold; margin: 0 0 10px; color: #000000;">
-        No Motion Design Clients? Here’s How to Fix It!
-      </p>
-      <a href="YOUTUBE_LINK_1" target="_blank" style="display: inline-block; background: #ff2d78; color: #ffffff; text-decoration: none; padding: 10px 16px; font-size: 14px; border-radius: 6px; font-weight: bold;">
-        Watch on YouTube
-      </a>
+    <h2>How I’d Attract My Ideal Clients (without losing my current ones)</h2>
+    <p><a href="https://youtu.be/KY2PD7jU0Sg" class="button">Watch on YouTube</a></p>
+
+    <h2>How to Price Your Motion Design Work in 2024</h2>
+    <p><a href="https://youtu.be/FId64n_zAXg" class="button">Watch on YouTube</a></p>
+
+    <p>If you have any questions or need any help, just reply to this email. I’d love to help you with your motion design business!</p>
+
+    <p>– Hayley</p>
+
+    <p>P.S. Looking for more? Visit my <a href="https://www.youtube.com/motionhatch">YouTube channel</a> or explore:</p>
+    <ul>
+      <li><a href="https://motionhatch.com/client-quest">Join Client Quest – get regular high-paying clients</a></li>
+      <li><a href="https://motionhatch.com/balanced-business-bootcamp">Balanced Business Bootcamp – 12 months of mentorship</a></li>
+      <li><a href="https://calendly.com/motionhatch/private-coaching">Work with me 1-1</a></li>
+      <li><a href="https://motionhatch.notion.site/Newsletter-Sponsorship">Sponsor this newsletter</a></li>
+    </ul>
+
+    <div class="footer">
+      Motion Hatch, 27 Old Gloucester Street, London, WC1N 3AX<br>
+      <a href="#">Unsubscribe</a>
     </div>
   </div>
+</body>
+</html>
 
-  <!-- Video Block 2 -->
-  <div style="display: flex; align-items: center; margin-bottom: 30px;">
-    <img src="THUMBNAIL_URL_2" alt="Video Thumbnail" style="width: 200px; border-radius: 6px; margin-right: 15px;">
-    <div>
-      <p style="font-size: 16px; font-weight: bold; margin: 0 0 10px; color: #000000;">
-        How I’d Start My Freelance Business in 2024
-      </p>
-      <a href="YOUTUBE_LINK_2" target="_blank" style="display: inline-block; background: #ff2d78; color: #ffffff; text-decoration: none; padding: 10px 16px; font-size: 14px; border-radius: 6px; font-weight: bold;">
-        Watch on YouTube
-      </a>
-    </div>
-  </div>
-
-  <!-- Video Block 3 -->
-  <div style="display: flex; align-items: center; margin-bottom: 30px;">
-    <img src="THUMBNAIL_URL_3" alt="Video Thumbnail" style="width: 200px; border-radius: 6px; margin-right: 15px;">
-    <div>
-      <p style="font-size: 16px; font-weight: bold; margin: 0 0 10px; color: #000000;">
-        How I’d Get Direct Clients Starting From 0
-      </p>
-      <a href="YOUTUBE_LINK_3" target="_blank" style="display: inline-block; background: #ff2d78; color: #ffffff; text-decoration: none; padding: 10px 16px; font-size: 14px; border-radius: 6px; font-weight: bold;">
-        Watch on YouTube
-      </a>
-    </div>
-  </div>
-
-  <!-- Video Block 4 -->
-  <div style="display: flex; align-items: center; margin-bottom: 30px;">
-    <img src="THUMBNAIL_URL_4" alt="Video Thumbnail" style="width: 200px; border-radius: 6px; margin-right: 15px;">
-    <div>
-      <p style="font-size: 16px; font-weight: bold; margin: 0 0 10px; color: #000000;">
-        How to Price Your Motion Design Work in 2024
-      </p>
-      <a href="YOUTUBE_LINK_4" target="_blank" style="display: inline-block; background: #ff2d78; color: #ffffff; text-decoration: none; padding: 10px 16px; font-size: 14px; border-radius: 6px; font-weight: bold;">
-        Watch on YouTube
-      </a>
-    </div>
-  </div>
-
-  <!-- Closing -->
-  <p style="font-size: 15px; color: #444444; line-height: 1.6; margin-top: 30px;">
-    If you have any questions or need any help, please hit reply to this email.  
-    I would love to help you with your motion design business!
-  </p>
-
-  <p style="font-size: 15px; color: #000000; font-weight: bold; margin-top: 10px;">Thanks,</p>
-  <p style="font-size: 15px; color: #000000; margin: 0;">Hayley</p>
-
-</div>
 `;
 
     // Send Email
