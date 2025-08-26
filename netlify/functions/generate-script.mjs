@@ -169,76 +169,134 @@ Now, generate a 60-second explainer video script that reflects the brand and off
 const emailTemplate = `
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Email Template</title>
-  </head>
-  <body style="margin:0; padding:0; background-color:#f3e8ff; font-family: Arial, sans-serif;">
-    <!-- Wrapper -->
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f3e8ff; padding: 30px 0;">
-      <tr>
-        <td align="center">
-          <!-- Main Container -->
-          <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color:#ffffff; border:2px solid #8b5cf6; border-radius:10px; overflow:hidden;">
-            <!-- Logo -->
-            <tr>
-              <td align="center" style="padding:20px;">
-                <img src="YOUR_LOGO_URL" alt="Logo" width="180" style="display:block; margin:auto;" />
-              </td>
-            </tr>
-            
-            <!-- Header Section -->
-            <tr>
-              <td style="padding: 0 30px 20px 30px; text-align:left; color:#111827;">
-                <h2 style="margin:0; font-size:22px; color:#4c1d95;">Hey ${business_name || "there"},</h2>
-                <p style="font-size:15px; line-height:1.6; margin-top:10px; color:#374151;">
-                  Over the next few days, I’m going to send you some of our best business and freelancing tips 🚀  
-                  Today, I want to share this <strong>ultimate guide</strong> that will help you find more clients and grow your business faster.
-                </p>
-              </td>
-            </tr>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email Template</title>
+  </head>
+  <body style="margin:0; padding:0; background-color:#f3e8ff; font-family: Arial, sans-serif;">
+    <!-- Wrapper -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f3e8ff; padding: 30px 0;">
+      <tr>
+        <td align="center">
+          <!-- Main Container -->
+          <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color:#ffffff; border:2px solid #8b5cf6; border-radius:10px; overflow:hidden;">
+            
+            <!-- Logo -->
+            <tr>
+              <td align="center" style="padding:20px;">
+                <img src="https://beliv8motion.com/wp-content/uploads/2024/03/Logo_Animation_Website_2-2.gif" alt="Logo" width="180" style="display:block; margin:auto;" />
+              </td>
+            </tr>
+           
+            <!-- Header Section -->
+            <tr>
+              <td style="padding: 0 30px 20px 30px; text-align:left; color:#111827;">
+                <h2 style="margin:0; font-size:22px; color:#4c1d95;">Hey ${business_name || "there"},</h2>
+                <p style="font-size:15px; line-height:1.6; margin-top:10px; color:#374151;">
+                  Here’s your <strong>amazing script</strong>  
+                  And right below it, you’ll also find some of our <strong>reference videos</strong> and the <strong>process we follow after the script phase</strong>.
+                </p>
+              </td>
+            </tr>
 
-            <!-- Divider -->
-            <tr>
-              <td>
-                <hr style="border:none; border-top:2px solid #8b5cf6; margin:0 30px;" />
-              </td>
-            </tr>
+            <!-- Divider -->
+            <tr>
+              <td>
+                <hr style="border:none; border-top:2px solid #8b5cf6; margin:0 30px;" />
+              </td>
+            </tr>
 
-            <!-- Script Content -->
-            <tr>
-              <td style="padding:20px 30px; text-align:left; color:#111827;">
-                <h3 style="margin:0 0 15px 0; font-size:20px; color:#4c1d95;">🎬 Your Explainer Video Script</h3>
-                <pre style="white-space: pre-wrap; font-family: monospace; background:#f4f4f4; padding:15px; border-radius:8px;">
+            <!-- Script Content -->
+            <tr>
+              <td style="padding:20px 30px; text-align:left; color:#111827;">
+                <h3 style="margin:0 0 15px 0; font-size:20px; color:#4c1d95;"> Your Explainer Video Script</h3>
+                <pre style="white-space: pre-wrap; font-family: monospace; background:#f4f4f4; padding:15px; border-radius:8px;">
 ${scriptContent}
-                </pre>
-              </td>
-            </tr>
+                </pre>
+              </td>
+            </tr>
 
-            <!-- YouTube Cards Section -->
-            <tr>
-              <td style="padding:20px 30px; text-align:left; color:#111827;">
-                <h3 style="margin:0 0 15px 0; font-size:20px; color:#4c1d95;">📺 Watch These Videos</h3>
-                ${videoCardsHTML}
-              </td>
-            </tr>
+            <!-- Reference Videos Section -->
+            <tr>
+              <td style="padding:20px 30px; text-align:left; color:#111827;">
+                <h3 style="margin:0 0 15px 0; font-size:20px; color:#4c1d95;"> Some of Our Reference Videos</h3>
+                
+                <!-- Video 1 -->
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;">
+                  <tr>
+                    <td width="40%" valign="top">
+                      <img src="YOUR_THUMBNAIL_URL_1" alt="Video Thumbnail" style="width:100%; border-radius:10px;" />
+                    </td>
+                    <td width="60%" valign="top" style="padding-left:15px;">
+                      <h4 style="margin:0; font-size:16px; color:#111827;">No Motion Design Clients? Here’s How to Fix It!</h4>
+                      <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                         style="display:inline-block; margin-top:8px; background:#8b5cf6; color:#fff; text-decoration:none; padding:8px 14px; border-radius:6px; font-size:14px;">
+                        Watch on YouTube
+                      </a>
+                    </td>
+                  </tr>
+                </table>
 
-            <!-- Footer -->
-            <tr>
-              <td style="padding:20px 30px; text-align:center; background-color:#f5f3ff;">
-                <p style="font-size:13px; color:#6b7280; margin:0;">
-                  You are receiving this email because you signed up for updates.  
-                  <br />
-                  <a href="#" style="color:#8b5cf6; text-decoration:none;">Unsubscribe</a> | <a href="#" style="color:#8b5cf6; text-decoration:none;">Manage Preferences</a>
-                </p>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
+                <!-- Video 2 -->
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;">
+                  <tr>
+                    <td width="40%" valign="top">
+                      <img src="YOUR_THUMBNAIL_URL_2" alt="Video Thumbnail" style="width:100%; border-radius:10px;" />
+                    </td>
+                    <td width="60%" valign="top" style="padding-left:15px;">
+                      <h4 style="margin:0; font-size:16px; color:#111827;">How I’d Start My Freelance Business in 2024</h4>
+                      <a href="https://www.youtube.com/watch?v=5qap5aO4i9A"
+                         style="display:inline-block; margin-top:8px; background:#8b5cf6; color:#fff; text-decoration:none; padding:8px 14px; border-radius:6px; font-size:14px;">
+                        Watch on YouTube
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Our Process Section -->
+            <tr>
+              <td style="padding:20px 30px; text-align:left; color:#111827; background:#f5f3ff; border-top:2px solid #8b5cf6;">
+                <h3 style="margin:0 0 15px 0; font-size:20px; color:#4c1d95;"> Our Process After the Script</h3>
+                <p style="font-size:15px; color:#374151; margin-bottom:15px;">
+                  Once the script is ready, we follow a structured process to bring your video to life:
+                </p>
+                <div style="text-align:center;">
+                  <a href="https://www.youtube.com/watch?v=lA1ibjcOwTY" target="_blank" style="display:inline-block;">
+                    <img src="https://img.youtube.com/vi/lA1ibjcOwTY/0.jpg" alt="Process Video" width="100%" style="border-radius:10px; max-width:500px;" />
+                  </a>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Closing CTA -->
+            <tr>
+              <td style="padding:20px 30px; text-align:left; color:#111827;">
+                <p style="font-size:15px; color:#374151; line-height:1.6;">
+                  If you’re interested in taking the <strong>video production process ahead</strong>, just reply to this email.  
+                  It usually takes us <strong>about 3 days</strong> to complete a polished video after the script phase. 
+                </p>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td style="padding:20px 30px; text-align:center; background-color:#f5f3ff;">
+                <p style="font-size:13px; color:#6b7280; margin:0;">
+                  You are receiving this email because you signed up for updates.  
+                  <br />
+                  <a href="#" style="color:#8b5cf6; text-decoration:none;">Unsubscribe</a> | <a href="#" style="color:#8b5cf6; text-decoration:none;">Manage Preferences</a>
+                </p>
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
 </html>
 `;
 
