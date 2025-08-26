@@ -214,87 +214,93 @@ Now, generate a structured 60-second explainer video script using the required s
 
     /* --------------------------- EMAIL TEMPLATE --------------------------- */
     const emailHTML = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>${business_name || "Your Brand"} | Explainer Video Script × Beliv8</title>
-</head>
-<body style="margin:0; padding:0; background:#efe9ff;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#efe9ff; padding:28px 0;">
-    <tr>
-      <td align="center">
-        <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="background:#ffffff; border:1px solid #c7b9ff; border-radius:16px; overflow:hidden;">
-          
-          <!-- TOP: Logo -->
-          <tr>
-            <td align="center" style="padding:24px 24px 8px 24px;">
-              <img src="https://beliv8motion.com/wp-content/uploads/2024/03/Logo_Animation_Website_2-2.gif" width="160" alt="Beliv8 Logo" style="display:block;">
-            </td>
-          </tr>
+<div style="font-family: Arial, sans-serif; background: #ffffff; padding: 20px; max-width: 650px; margin: auto; border: 1px solid #e0e0e0; border-radius: 8px;">
 
-          <!-- Greeting / Intro -->
-          <tr>
-            <td style="padding:0 28px 20px 28px;">
-              <h2 style="margin:0; font-size:22px; line-height:1.3; color:#6d28d9; font-weight:800;">
-                Hey ${business_name || "there"},
-              </h2>
-              <p style="margin:8px 0 0 0; font-size:15px; line-height:1.6; color:#334155;">
-                Here’s your <strong>amazing script</strong>. Below you’ll also find a few <strong>reference videos</strong> and the <strong>process we follow after the script phase</strong>.
-              </p>
-            </td>
-          </tr>
+  <!-- Logo -->
+  <div style="text-align: center; margin-bottom: 20px;">
+    <img src="YOUR_LOGO_URL" alt="Logo" style="max-height: 40px;">
+    <hr style="border: none; border-top: 2px solid #00C2FF; margin-top: 15px;">
+  </div>
 
-          <!-- Script Map -->
-          <tr>
-            <td style="padding:4px 28px 24px 28px;">
-              <h3 style="margin:0 0 12px 0; font-size:18px; line-height:1.3; color:#6d28d9; font-weight:800;">Your Explainer Script</h3>
-              ${scriptHTML}
-            </td>
-          </tr>
+  <!-- Greeting -->
+  <p style="font-size: 16px; color: #333333; margin: 0 0 20px;">
+    Hey ${business_name || "there"}!
+  </p>
 
-          <!-- Reference Videos -->
-          <tr>
-            <td style="padding:0 28px 8px 28px;">
-              <h3 style="margin:0 0 12px 0; font-size:18px; line-height:1.3; color:#6d28d9; font-weight:800;">Reference Videos</h3>
-              ${renderVideoRows(reference_videos)}
-            </td>
-          </tr>
+  <!-- Intro -->
+  <p style="font-size: 15px; color: #444444; line-height: 1.6; margin-bottom: 20px;">
+    Over the next few days, I'm going to send you some of our best content and free resources. Enjoy! <br><br>
+    Today, I want to share the most helpful YouTube videos I’ve created to help you attract more clients. <br><br>
+    Bookmark this email so you can come back to it!
+  </p>
 
-          <!-- Process (Mega Card) -->
-          <tr>
-            <td style="padding:8px 28px 24px 28px;">
-              <h3 style="margin:0 0 12px 0; font-size:18px; line-height:1.3; color:#6d28d9; font-weight:800;">Our Process</h3>
-              <table width="100%" cellpadding="0" cellspacing="0" role="presentation"
-                     style="border:1px solid #eae7f9; background:#f8f7ff; border-radius:14px;">
-                <tr>
-                  <td style="padding:16px;">
-                    <a href="${processVideoUrl}" target="_blank" style="text-decoration:none;">
-                      <img src="${processThumb}" alt="Our process video" width="100%"
-                           style="display:block; width:100%; border-radius:12px;">
-                    </a>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+  <!-- Section Headline -->
+  <h2 style="font-size: 20px; color: #000000; margin-bottom: 20px;">
+    🎬 My Ultimate Guide to Getting Hired
+  </h2>
 
-          <!-- CTA -->
-          <tr>
-            <td style="padding:6px 28px 28px 28px;">
-              <p style="margin:0; font-size:15px; line-height:1.7; color:#334155;">
-                Interested in taking the <strong>video production process ahead</strong>? Just reply to this email.
-              </p>
-            </td>
-          </tr>
+  <!-- Video Block 1 -->
+  <div style="display: flex; align-items: center; margin-bottom: 30px;">
+    <img src="THUMBNAIL_URL_1" alt="Video Thumbnail" style="width: 200px; border-radius: 6px; margin-right: 15px;">
+    <div>
+      <p style="font-size: 16px; font-weight: bold; margin: 0 0 10px; color: #000000;">
+        No Motion Design Clients? Here’s How to Fix It!
+      </p>
+      <a href="YOUTUBE_LINK_1" target="_blank" style="display: inline-block; background: #ff2d78; color: #ffffff; text-decoration: none; padding: 10px 16px; font-size: 14px; border-radius: 6px; font-weight: bold;">
+        Watch on YouTube
+      </a>
+    </div>
+  </div>
 
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
+  <!-- Video Block 2 -->
+  <div style="display: flex; align-items: center; margin-bottom: 30px;">
+    <img src="THUMBNAIL_URL_2" alt="Video Thumbnail" style="width: 200px; border-radius: 6px; margin-right: 15px;">
+    <div>
+      <p style="font-size: 16px; font-weight: bold; margin: 0 0 10px; color: #000000;">
+        How I’d Start My Freelance Business in 2024
+      </p>
+      <a href="YOUTUBE_LINK_2" target="_blank" style="display: inline-block; background: #ff2d78; color: #ffffff; text-decoration: none; padding: 10px 16px; font-size: 14px; border-radius: 6px; font-weight: bold;">
+        Watch on YouTube
+      </a>
+    </div>
+  </div>
+
+  <!-- Video Block 3 -->
+  <div style="display: flex; align-items: center; margin-bottom: 30px;">
+    <img src="THUMBNAIL_URL_3" alt="Video Thumbnail" style="width: 200px; border-radius: 6px; margin-right: 15px;">
+    <div>
+      <p style="font-size: 16px; font-weight: bold; margin: 0 0 10px; color: #000000;">
+        How I’d Get Direct Clients Starting From 0
+      </p>
+      <a href="YOUTUBE_LINK_3" target="_blank" style="display: inline-block; background: #ff2d78; color: #ffffff; text-decoration: none; padding: 10px 16px; font-size: 14px; border-radius: 6px; font-weight: bold;">
+        Watch on YouTube
+      </a>
+    </div>
+  </div>
+
+  <!-- Video Block 4 -->
+  <div style="display: flex; align-items: center; margin-bottom: 30px;">
+    <img src="THUMBNAIL_URL_4" alt="Video Thumbnail" style="width: 200px; border-radius: 6px; margin-right: 15px;">
+    <div>
+      <p style="font-size: 16px; font-weight: bold; margin: 0 0 10px; color: #000000;">
+        How to Price Your Motion Design Work in 2024
+      </p>
+      <a href="YOUTUBE_LINK_4" target="_blank" style="display: inline-block; background: #ff2d78; color: #ffffff; text-decoration: none; padding: 10px 16px; font-size: 14px; border-radius: 6px; font-weight: bold;">
+        Watch on YouTube
+      </a>
+    </div>
+  </div>
+
+  <!-- Closing -->
+  <p style="font-size: 15px; color: #444444; line-height: 1.6; margin-top: 30px;">
+    If you have any questions or need any help, please hit reply to this email.  
+    I would love to help you with your motion design business!
+  </p>
+
+  <p style="font-size: 15px; color: #000000; font-weight: bold; margin-top: 10px;">Thanks,</p>
+  <p style="font-size: 15px; color: #000000; margin: 0;">Hayley</p>
+
+</div>
 `;
 
     // Send Email
