@@ -144,19 +144,27 @@ Now, generate a 60-second explainer video script that reflects the brand and off
 
     const videoCardsHTML = `
   <table width="100%" cellspacing="0" cellpadding="0" border="0">
-    <tr>
+  <tr>
       <td style="padding:10px; text-align:center;">
-        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" 
+        <a href="https://www.youtube.com/watch?v=f63piAO9k1Y"
            style="text-decoration:none; color:#4c1d95;">
-          🎥 Watch: How to Make Better Scripts
+          🎥 Watch: Motion Graphics High End Animated Explainer Video for Arhasi AI
         </a>
       </td>
     </tr>
     <tr>
       <td style="padding:10px; text-align:center;">
-        <a href="https://www.youtube.com/watch?v=5qap5aO4i9A"
+        <a href="https://www.youtube.com/watch?v=C0L6WipiDM0"
            style="text-decoration:none; color:#4c1d95;">
-          🎥 Watch: Tips for Motion Designers
+          🎥 Watch: Best Motion Graphics Explainer Video Series | TestParty AI - Automated WCAG Compliance
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:10px; text-align:center;">
+        <a href="https://www.youtube.com/watch?v=lA1ibjcOwTY" 
+           style="text-decoration:none; color:#4c1d95;">
+          🎥 Watch: The Secret Behind High-Converting Explainer Videos | How we do it..!
         </a>
       </td>
     </tr>
