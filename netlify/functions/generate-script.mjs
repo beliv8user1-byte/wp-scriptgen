@@ -201,8 +201,9 @@ const emailTemplate = `
               <td style="padding: 0 30px 20px 30px; text-align:left; color:#111827;">
                 <h2 style="margin:0; font-size:22px; color:#4c1d95;">Hey ${business_name || "there"},</h2>
                 <p style="font-size:15px; line-height:1.6; margin-top:10px; color:#374151;">
-                  Over the next few days, I’m going to send you some of our best business and freelancing tips 🚀  
-                  Today, I want to share this <strong>ultimate guide</strong> that will help you find more clients and grow your business faster.
+                  <p>You’re all set with the perfect script!</p> 
+                  <p>Now, let’s turn it into a powerful video 🚀</p>
+                  <p>Below, you’ll find our step-by-step process for creating high-converting videos, along with a selection of sample videos to spark inspiration.</p>
                 </p>
               </td>
             </tr>
