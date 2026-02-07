@@ -109,23 +109,42 @@ Now, generate a 60-second explainer video script that reflects the brand and off
 `;
 
     // Call OpenRouter API
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        "Content-Type": "application/json",
+    // const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    //   method: "POST",
+    //   headers: {
+    //     "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({
+    //     model: process.env.OPENROUTER_MODEL || "gpt-4o-mini",
+    //     messages: [{ role: "user", content: prompt }],
+    //   }),
+    // });
+
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+  method: "POST",
+  headers: {
+    "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    model: process.env.OPENAI_MODEL || "gpt-4o-mini",
+    messages: [
+      {
+        role: "system",
+        content: SCRIPT_INSTRUCTIONS,
       },
-      body: JSON.stringify({
-        model: process.env.OPENROUTER_MODEL || "gpt-4o-mini",
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
+    temperature: 0.7,
+  }),
+});
 
     const data = await response.json();
-    const scriptContent =
-      data.choices?.[0]?.message?.content ||
-      data.choices?.[0]?.delta?.content ||
-      "No script generated";
+    const scriptContent = data?.choices?.[0]?.message?.content ?? "No script generated";
 
     // Email Template
 //     const emailTemplate = `
